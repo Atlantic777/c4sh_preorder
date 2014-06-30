@@ -11,7 +11,7 @@ urlpatterns = patterns('',
 
 import sys
 import os
-if (sys.argv[1] in ['runserver', 'runserver_plus'] or os.environ.get('ENABLE_ADMIN_ROUTES', False)):
+if True: #(sys.argv[0] in ['runserver', 'runserver_plus'] or os.environ.get('ENABLE_ADMIN_ROUTES', False)):
 	urlpatterns += patterns('',
 		url(r'^admin42/', include(admin.site.urls)),
 		(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': STATIC_ROOT, 'show_indexes': False}),

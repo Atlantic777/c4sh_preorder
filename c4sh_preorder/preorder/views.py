@@ -31,10 +31,21 @@ def get_cart(session_cart):
 					continue
 				cart_quota = PreorderQuota.objects.get(Q(sold__lt=F('quota')), Q(ticket__active=True), Q(ticket__deleted=False), Q(pk=q))
 				cart.append({'quota': cart_quota, 'amount': int(session_cart[q]['amount'])})
+#				print ">>> cart_quota"
+#				print "cart_quota:", cart_quota
+#				print "dir:", dir(cart_quota)
+#				print "ticket:", cart_quota.ticket
+#				print "ticket_id:", cart_quota.ticket_id
+#				print "ticket__sortorder:", cart_quota.ticket__sortorder
+#				print ">>>>>>"
 			except:
 				continue
 	else:
 		return False
+#	print ">>>>>> cart", cart
+#	cart.sort(key=lambda x: x['quota'].id)
+	cart.sort(key=lambda x: CustomPreorderTicket.objects.get(Q(preorderticket_ptr_id=x['quota'].id)).sortorder)
+#	print ">>>>>> sorted cart", cart
 	return cart
 
 ###### VIEWS #######
@@ -96,14 +107,20 @@ def buy_view(request):
 @preorder_check
 @payload_check
 def order_view(request):
+	print "order view hello world"
 	if not request.POST:
+		print "order view failing!"
 		raise Http404
 	else:
+		print "trying to get cart"
 		cart = get_cart(request.session.get('cart', False))
+		print "OK, got cart!"
 
 		if not cart:
 			messages.error(request, _('Cart is empty. Maybe someone was faster with his preorder and now the quota which your ticket belonged to is exceeded. Please try again.'))
 			return HttpResponseRedirect(reverse("default"))
+
+		print "trying to save preorder"
 
 		# create Preorder
 		preorder = CustomPreorder(
@@ -117,6 +134,10 @@ def order_view(request):
 			cached_sum=0
 		)
 		preorder.save()
+
+		print "preorder saved"
+
+
 
 		form = BillingAddressForm(request.POST)
 
@@ -133,6 +154,8 @@ def order_view(request):
 				billing_address.country = form.cleaned_data['country']
 				billing_address.preorder = preorder
 				billing_address.save()
+
+		print "calculating quota"
 
 		for c in cart:
 			amount = c['amount']
@@ -169,9 +192,13 @@ def order_view(request):
 
 			quota.save()
 
+		print "quota saved"
+
 
 		preorder.cached_sum = simplejson.dumps(preorder.get_sale_amount())
 		preorder.save()
+
+		print "preorder saved again"
 
 		request.session['cart'] = {}
 		del request.session['billing_address']
@@ -182,6 +209,11 @@ def order_view(request):
 				billing_address.generate_invoice_pdf()
 		except:
 			pass
+
+
+
+
+		print "create invoice passed"
 
 		# sending out success notification via email -- if email is set
 		if request.user.email:
@@ -196,6 +228,7 @@ def order_view(request):
 @preorder_check
 @payload_check
 def checkout_view(request):
+	print "Hello world"
 	cart = get_cart(request.session.get('cart', False))
 	if cart:
 		totals_raw = {}
@@ -287,12 +320,14 @@ def cart_view(request, action):
 			messages.error(request, _("Your selected amount %(amount)d of %(ticket)s is not available.") % {'amount':int(new_amount), 'ticket':quota.ticket})
 			return HttpResponseRedirect(reverse("default"))
 		else:
-			session_cart[int(quota.pk)] = {'amount': new_amount}
+			#session_cart[int(quota.pk)] = {'amount': new_amount}
+			session_cart[str(quota.pk)] = {'amount': new_amount}
 			request.session['cart'] = session_cart
 
 		return HttpResponseRedirect(reverse("default"))
 
 	elif action == "amend":
+		print "starting ammend"
 		try:
 			if not quota_id or not amount or int(amount) < 0:
 				messages.error(request, _("Got unexpected post data - please try again."))
@@ -300,6 +335,7 @@ def cart_view(request, action):
 		except ValueError:
 			messages.error(request, _("You are expected to enter digits.. Nothing else."))
 			return HttpResponseRedirect(reverse("default"))
+		print "ok params"
 
 		try:
 			quota = PreorderQuota.objects.get(Q(sold__lt=F('quota')), Q(ticket__active=True), Q(ticket__deleted=False), Q(pk=quota_id),
@@ -318,11 +354,13 @@ def cart_view(request, action):
 			return HttpResponseRedirect(reverse("default"))
 		except:
 			raise
+		print "ok quota"
 
 		session_cart = request.session.get('cart', False)
 		if not session_cart:
 			return HttpResponseRedirect(reverse("default"))
 
+		print "starting change"
 		user_limit_exceeded = False
 		if quota.ticket.limit_amount_user > 0 and int(amount) > quota.ticket.limit_amount_user:
 			user_limit_exceeded = True
@@ -330,8 +368,14 @@ def cart_view(request, action):
 			messages.error(request, _("Your selected amount %(amount)d of %(ticket)s is not available." % {'amount':int(amount), 'ticket':quota.ticket}))
 			return HttpResponseRedirect(reverse("default"))
 		else:
-			session_cart[int(quota_id)] = {'amount': amount}
+			print "changed ammount", amount
+			print "quota id", int(quota_id)
+#			session_cart[int(quota_id)] = {'amount': amount}
+			session_cart[quota_id] = {'amount': amount}
+			print session_cart[quota_id]['amount']
 			request.session['cart'] = session_cart
+			print "session_cart", session_cart
+			print "request.session", request.session
 
 		return HttpResponseRedirect(reverse("default"))
 
@@ -340,7 +384,8 @@ def cart_view(request, action):
 		if not session_cart:
 			return HttpResponseRedirect(reverse("default"))
 
-		session_cart[int(quota_id)] = {'amount': 0}
+		#session_cart[int(quota_id)] = {'amount': 0}
+		session_cart[quota_id] = {'amount': 0}
 		request.session['cart'] = session_cart
 
 		return HttpResponseRedirect(reverse("default"))
@@ -571,12 +616,13 @@ def print_tickets_view(request, preorder_id, secret):
 
 		#PDF "header"
 		pdf.image('%s%s' % (settings.STATIC_ROOT, settings.EVENT_LOGO), 15, 15, 200, 96)
-		#pdf.set_font(font,'B',27)
-		#pdf.text(20,50,"%s" % 'SIGINT 2013')
-		pdf.set_font(font,'I',6)
-		pdf.text(110,100,"%s" % 'July 5th - July 7th')
-		pdf.text(110,107,"%s" % 'Mediapark, Cologne, Germany')
-		pdf.text(110,114,"%s" % 'https://sigint.ccc.de/')
+		pdf.set_font(font,'B',27)
+                pdf.text(20,145,"%s" % 'Balkan Computer Congress')
+		pdf.text(20,175,"%s" % 'BalCCon2k14 - Second Base')
+		pdf.set_font(font,'I',16)
+		pdf.text(20,205,"%s" % 'September 5th - 7th, 2014')
+		pdf.text(20,225,"%s" % 'Master Centar, Novi Sad, Serbia')
+		pdf.text(20,245,"%s" % 'https://balccon.org')
 
 		pdf.set_font(font,'I',40)
 
@@ -617,15 +663,15 @@ def print_tickets_view(request, preorder_id, secret):
 
 
 		# print ticket table
-		pdf.set_font(font,'I',15)
-		pdf.text(20,260,"Type")
+		pdf.set_font(font,'B',20)
+		pdf.text(20,280,"Type")
 		if ticket.price > 0:
-			pdf.text(350,260,"Price")
+			pdf.text(350,280,"Price")
 
 		i = 0
 
 		pdf.set_font(font,'B',20)
-		pdf.set_y(270+i)
+		pdf.set_y(280+i)
 		pdf.set_x(20)
 		pdf.set_right_margin(250)
 		pdf.set_left_margin(17)
@@ -636,7 +682,7 @@ def print_tickets_view(request, preorder_id, secret):
 		pdf.set_left_margin(20)
 
 		if ticket.price > 0:
-			pdf.text(350, 302, "%s %s" % (str(floatformat(ticket.price, 2)), "€" if ticket.currency == "EUR" else ticket.currency))
+			pdf.text(350, 310, "%s %s" % (str(floatformat(ticket.price, 2)), "€" if ticket.currency == "EUR" else ticket.currency))
 
 			pdf.set_font(font,'',11)
 			price_vat = str(floatformat(float(ticket.price)-float(ticket.price)/(float(ticket.tax_rate)/100+1), 2))
@@ -644,13 +690,13 @@ def print_tickets_view(request, preorder_id, secret):
 			#pdf.text(350, 320, "incl. %s%% VAT: %s %s" % (ticket.tax_rate, price_vat, ticket.currency))
 			#if ticket.price >= 150:
 			pdf.set_font(font,'',7)
-			pdf.text(350, 314, "%(price_net)s %(currency)s net + %(tax_rate)s%% VAT (%(price_vat)s %(currency)s) = %(price)s %(currency)s total" % ({
-				'tax_rate': ticket.tax_rate,
-				'price': ticket.price,
-				'price_net': price_net,
-				'price_vat': price_vat,
-				'currency': "€" if ticket.currency == "EUR" else ticket.currency,
-				}))
+		#	pdf.text(350, 314, "%(price_net)s %(currency)s net + %(tax_rate)s%% VAT (%(price_vat)s %(currency)s) = %(price)s %(currency)s total" % ({
+		#		'tax_rate': ticket.tax_rate,
+		#		'price': ticket.price,
+		#		'price_net': price_net,
+		#		'price_vat': price_vat,
+		#		'currency': "€" if ticket.currency == "EUR" else ticket.currency,
+		#		}))
 
 		## special tickets
 		special_tickets = {
@@ -687,8 +733,8 @@ def print_tickets_view(request, preorder_id, secret):
 		pdf.write(20, '%s' % settings.EVENT_INVOICE_ADDRESS)
 		pdf.set_font(font, '', 10)
 		pdf.set_y(640)
-		if ticket.price > 0:
-			pdf.write(15, '%s' % settings.EVENT_INVOICE_LEGAL)
+		#if ticket.price > 0:
+		#	pdf.write(15, '%s' % settings.EVENT_INVOICE_LEGAL)
 		pdf.set_font(font, '', 10)
 		pdf.set_y(680)
 		pdf.write(15, 'Issued: %s' % time.strftime('%Y-%m-%d %H:%M', time.gmtime()))
@@ -696,10 +742,10 @@ def print_tickets_view(request, preorder_id, secret):
 		pdf.set_y(720)
 		pdf.set_right_margin(300)
 
-		if ticket.price > 0 and ticket.price < 150:
-			pdf.write(10, "Bis zu einem Ticketpreis von 150,00 EUR gilt das Ticket gleichzeitig als Kleinbetragsrechnung im Sinne von § 33 UStDV. Umtausch und Rückgabe ausgeschlossen.")
-		elif ticket.price >= 150:
-			pdf.write(10, "Umtausch und Rückgabe ausgeschlossen.")
+		#if ticket.price > 0 and ticket.price < 150:
+		#	pdf.write(10, "Bis zu einem Ticketpreis von 150,00 EUR gilt das Ticket gleichzeitig als Kleinbetragsrechnung im Sinne von § 33 UStDV. Umtausch und Rückgabe ausgeschlossen.")
+		#elif ticket.price >= 150:
+		#	pdf.write(10, "Umtausch und Rückgabe ausgeschlossen.")
 
 
 	response = HttpResponse(mimetype="application/pdf")
