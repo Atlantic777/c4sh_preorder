@@ -6,7 +6,7 @@ if socket.gethostname() == "$YOUR_DEPLOYMENT_HOST":
 	DEBUG = False
 	TEMPLATE_DEBUG = DEBUG
 	APP_URL = "preorder"
-	EMAIL_BACKEND = 'c4sh_preorder.preorder.sendmail.EmailBackend'
+	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 	MEDIA_ROOT = '/home/www/presale/c4sh_preorder/media/'
 	MEDIA_URL = '/media/'
 	STATIC_ROOT = '/home/www/presale/c4sh_preorder/static/'

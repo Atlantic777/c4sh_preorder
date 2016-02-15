@@ -1,0 +1,25 @@
+{% load tax_calc i18n %}
+{% blocktrans with user as u %}
+Hello {{u}},
+
+thank you for your preorder!
+{% endblocktrans %}
+
+{% trans "Amount" %}      {% trans "Ticket type" %}           {% trans "Price per Ticket" %}
+=================================================================
+{% for p in preorder.get_tickets %}                        
+{{p.amount}}              {{p.t.name }}                       {{p.t.price|tax_calc:p.t.price|floatformat:0 }} {%trans " EUR" %} 
+{% endfor %}                                               
+-----------------------------------------------------------------
+                                Total: {% for total in preorder.get_sale_amount%} {{total.total|tax_calc:total.total|floatformat:0}}{%trans " EUR"%}{%endfor %}
+{% blocktrans %}
+Please do not forget to pay for your tickets until {{payment_until}}
+{% endblocktrans %}
+{% trans "Please transfer the total amount (see above) to:"%}
+
+{% trans "Wau Holland Foundation"%}
+{% trans "Institute: Commerzbank Kassel "%}
+{% trans "IBAN: DE08520400210277281209"%}
+{% trans "SWIFT/BIC: COBADEFFXXX"  %}
+
+{% trans "Reference:"%} {{payment_prefix}}-{{preorder.get_reference_hash}}

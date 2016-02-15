@@ -13,7 +13,7 @@ if settings.EVENT_DAAS_ENABLE:
 
 class UserProfile(models.Model):
 	user = models.OneToOneField(User, primary_key=True, related_name='user_profile')
-
+	#country = models.CharField(max_length=10, null=False,blank=False, verbose_name="country")
 	# Hack to avoid IntegrityErrors while using Django forms to create users
 	def save(self, *args, **kwargs):
 		if not self.pk:
@@ -153,11 +153,11 @@ class CustomPreorder(Preorder):
 
 	def get_sale_amount(self):
 		totals_raw = {}
-		try:
+		try:    
 			tickets = self.get_tickets()
 			for t in tickets:
 				amount = float(t['t'].price)*int(t['amount'])
-				taxes = float(amount) - (float(amount) / (float(t['t'].tax_rate)/float(100)+float(1)))
+				taxes = float(amount) / float(115)
 
 				try:
 					totals_raw[t['t'].currency]['amount']+=amount
@@ -166,12 +166,14 @@ class CustomPreorder(Preorder):
 					totals_raw[t['t'].currency]['amount']=amount
 
 				try:
-					[item for item in totals_raw[t['t'].currency]['taxes'] if item['rate'] == t['t'].tax_rate][0]['amount']+=taxes
-				except KeyError:
-					totals_raw[t['t'].currency]['taxes'] = []
-					totals_raw[t['t'].currency]['taxes'].append({'rate':t['t'].tax_rate, 'amount': taxes})
-				except IndexError:
-					totals_raw[t['t'].currency]['taxes'].append({'rate':t['t'].tax_rate, 'amount': taxes})
+                                     [item for item in totals_raw[t['t'].currency]['taxes'] if item['rate'] == t['t'].tax_rate][0]['taxes'] +=taxes
+                                     #total_raw[t['t'].currency]['taxes']+=taxes
+                                except KeyError:
+                                        totals_raw[t['t'].currency]['taxes'] =[]
+                                        totals_raw[t['t'].currency]['taxes'].append({'rate':t['t'].tax_rate, 'amount': taxes})
+
+                                except IndexError:
+                                        totals_raw[t['t'].currency]['taxes'].append({'rate':t['t'].tax_rate, 'amount': taxes})
 
 			totals = []
 			for t in totals_raw:

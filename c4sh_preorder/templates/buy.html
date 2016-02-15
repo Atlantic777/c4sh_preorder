@@ -49,7 +49,7 @@
                       <span style="font-size: larger;">{{q.ticket.name}}</span>
                     </td>
                     <td style="vertical-align:middle;">
-                      {{q.ticket.price}} {{q.ticket.currency}} {% trans "(incl. tax)"%}
+                      {{q.ticket.price}} {{q.ticket.currency}}{% trans " / "%}{{q.ticket.tax_rate}} {% trans " EUR"%}
                     </td>
                     <td>
                         <form style="margin:0" action="{% url "cart-add" %}" method="post" role="form">
@@ -115,7 +115,7 @@
                       <form style="margin:0" action="{% url "cart-add" %}" method="post">
                       <select name="quota" class="form-control">
                         {% for t in m.tshirt_set.all %}
-                          <option value="{{ tshirt_quota|get_index:t.pk }}">{{t.tshirt.type}} {{t.tshirt.size}} {{t.tshirt.price}} {{t.tshirt.currency}} {% trans "(incl. tax)"%}</option>
+                          <option value="{{ tshirt_quota|get_index:t.pk }}">{{t.tshirt.type}} {{t.tshirt.size}} {{t.tshirt.price}} {{t.tshirt.currency}}{% trans " /"%}{{t.tshirt.tax_rate}} {% trans " EUR"%}</option>
                         {% endfor %}
                       </select>
                     </td>
@@ -159,8 +159,8 @@
                     <tr>
                       <td style="vertical-align:middle;">{{c.amount}}x</td>
                       <td style="vertical-align:middle;">{{c.quota.ticket.name}}</td>
-                      <td style="vertical-align:middle;">{{c.quota.ticket.price}}&nbsp;{{c.quota.ticket.currency}}<br /><small>{% trans "(incl. tax)"%}</small></td>
-                      <td style="vertical-align:middle;">{{c.quota.ticket.price|multiply:c.amount|floatformat:2}}&nbsp;{{c.quota.ticket.currency}}<br/><small>{% trans "(incl. tax)"%}</small></td>
+                      <td style="vertical-align:middle;">{{c.quota.ticket.price}}&nbsp;{{c.quota.ticket.currency}}<br />{{c.quota.ticket.tax_rate}}{% trans " EUR"%}</td>
+                      <td style="vertical-align:middle;">{{c.quota.ticket.price|multiply:c.amount|floatformat:2}}&nbsp;{{c.quota.ticket.currency}}<br/>{{c.quota.ticket.tax_rate|multiply:c.amount|floatformat:2}}{% trans " EUR"%}</small></td>
                       <td style="text-align:right;">
                           <div class="input-group">
                             <span class="input-group-btn">
@@ -207,7 +207,7 @@
 
       <div class="clearfix hide-sm" style="height: 20px;"></div>
 
-      <div class="row">
+     <!-- <div class="row">
         {% if not cart %}
         {% if not settings.EVENT_FRIENDS_ENABLED %}
           <div class="col-md-3"></div>
@@ -236,7 +236,7 @@
              </form>
             </div>
           </div>
-        </div>
+        </div>-->
         {% if not settings.EVENT_FRIENDS_ENABLED %}
           <div class="col-md-3"></div>
         {% endif %}
@@ -256,7 +256,7 @@
             </div>
             <div class="panel-body">
               <p>
-                {% trans "If you are 18 or older, but for some reason you have trouble paying the full entrance fee, apply for a Friends ticket here." %}
+                {% trans "*If you are 18 or older, but for some reason you have trouble paying the full entrance fee, apply for a Friends ticket here." %}
               </p>
               <form class="form-token form-horizontal">
                 <div class="form-group">

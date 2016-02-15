@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 {% load i18n %}
-{% load multiply timedelta %}
+{% load multiply timedelta tax_calc %}
 
 {% block content %}
       <div class="row">
@@ -11,7 +11,8 @@
             </div>
             <div class="panel-body">
             {% if preorders %}
-              <p>{% trans "Thanks for your preorder. Please transfer the total amount to:"%}</p>
+              <p><b>{% trans "Thanks for your preorder."%}</b></p>
+	      <p>{% trans "For visitors from Serbia:  Please transfer the total amount to:"%}</p>
               <pre>{% spaceless %}
                 {{settings.EVENT_PAYMENT_DETAILS}}<br /><br />
                 {% for p in preorders %}
@@ -43,6 +44,22 @@
         	  {% else %}
               {% trans "Here be payment information after you preordered tickets."%}
             {% endif %}
+	    <table class="table table-striped table-bordered">
+	    <tr>
+	     <b><div>{% trans "Important: For foreign visitors, please transfer the total amount to:"%}</div></b>
+	    <pre>{% spaceless %}
+	    <div>{% trans "Wau Holland Foundation"%}</div>
+	    <div>{% trans "Institute: Commerzbank Kassel "%}</div>
+	    <div>{% trans "IBAN: DE08520400210277281209 "%}</div>
+	    <div>{% trans "SWIFT/BIC: COBADEFFXXX  "%}</div>
+	    <br>
+	      {% for p in preorders %}
+	        <div>Reference: <ref>{{settings.EVENT_PAYMENT_PREFIX}}-{{p.get_reference_hash}}</ref></div>
+		<div>Amount: {{p.get_sale_amount.0.total|tax_calc:p.get_sale_amount.0.total|floatformat:0}} {% trans "EUR" %}</div>
+		{% endfor %}
+	    {% endspaceless %}</pre>
+	    </tr>
+	    </table>
             </div>
           </div>
         </div>
@@ -110,14 +127,14 @@
                             {% if p.paid and p.paid_via == 'goldentoken' %}
                               Golden token
                             {% else %}
-                              {{t.t.price|floatformat:2}} {{t.t.currency}}<br/><small>(incl. tax)</small>
+                              {{t.t.price|floatformat:2}} {{t.t.currency}}<br/> {{t.t.tax_rate|floatformat:2}} EUR
                             {% endif %}
                           </td>
                           <td style="vertical-align:middle;">
                             {% if p.paid and p.paid_via == 'goldentoken' %}
                               Golden token
                             {% else %}
-                              {{t.t.price|multiply:t.amount|floatformat:2}} {{t.t.currency}}<br/><small>(incl. tax)</small>
+                              {{t.t.price|multiply:t.amount|floatformat:2}} {{t.t.currency}}<br/>{{t.t.tax_rate|multiply:t.amount|floatformat:2}} EUR
                             {% endif %}
                           </td>
                         </tr>
@@ -130,11 +147,9 @@
                               Golden token
                               {% else %}
                                 <span style="border-bottom: 3px double;">{{t.total|floatformat:2}} {{t.currency}}</span>
-                                <div style="margin-top:5px;line-height:0.9em;">
-                                {% for tax in t.taxes %}
-                                  <span style="font-size:x-small;">incl. {{tax.rate}}% taxes: {{tax.amount|floatformat:2}} {{t.currency}}</span><br />
-                                {% endfor %}
-                                </div>
+				<div style="margin-top:5px;line-height:0.9em;">
+				<span style="border-bottom: 3px double;">{{t.total|tax_calc:t.total|floatformat:0}}{%trans " EUR"%} </span></ br>
+				</div>
                               {% endif %}
                             </th>
                           </tr>
@@ -145,17 +160,10 @@
 
                   {% if p.get_billing_address %}
                   <tr>
-                    <th colspan="1" style="vertical-align:top;">{% trans "Billing address" %}</th>
+                    <th colspan="1" style="vertical-align:top;">{% trans "Contry" %}</th>
                     <td colspan="4" style="background-color:#fff">
-                      {% if p.get_billing_address.company %}
-                      {{p.get_billing_address.company}} <br />
-                      {% endif %}
-                      {{p.get_billing_address.firstname}} {{p.get_billing_address.lastname}} <br />
-                      {{p.get_billing_address.address1}} {% if p.get_billing_address.address2 %}<br />
-                      {{p.get_billing_address.address2}} {% endif %} <br />
-                      {{p.get_billing_address.zip}} {{p.get_billing_address.city}} <br />
                       {{p.get_billing_address.country}}<br/>
-                      <span style="font-size: 85%">If your billing address is incorrect, please <a href="mailto:{{settings.EVENT_CONTACT_MAILTO}}?subject=Billing+address+incorrect">contact us</a>.</span>
+                      <span style="font-size: 85%"></span>
                     </td>
                   </tr>
                   {% endif %}

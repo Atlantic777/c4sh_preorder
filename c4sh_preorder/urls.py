@@ -60,7 +60,7 @@ urlpatterns += patterns('django.contrib.auth.views',
 	url(r'^login/$', 'login', {'template_name': 'default.html'}, name="login"),
 	url(r'^logout/$', 'logout', {'next_page': '/'}, name="logout"),
 	url(r'^password-reset/$', 'password_reset', {'is_admin_site': False, 'template_name': 'base/password_reset.html'}, name="password-reset"),
-	url(r'^password-reset/done/$', 'password_reset_done', {'template_name': 'base/password_reset_confirm.html'}, name="password-reset-done"),
-	url(r'^password-reset/(?P<uidb36>[0-9A-Za-z]{1,13})-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', 'password_reset_confirm', {'template_name': 'base/password_reset_form.html'}, name="password-reset-confirm"),
-	url(r'^password-reset/complete/$', 'password_reset_complete', {'template_name': 'base/password_reset_complete.html'}, name="password-reset-complete")
+	url(r'^password-reset/done/$', 'password_reset_done', {'template_name': 'base/password_reset_confirm.html'}, name="password_reset_done"),
+	url(r'^password-reset/(?P<uidb64>[0-9A-Za-z]{1,13})-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', 'password_reset_confirm', {'template_name': 'base/password_reset_form.html'}, name="password_reset_confirm"),
+	url(r'^password-reset/complete/$', 'password_reset_complete', {'template_name': 'base/password_reset_complete.html'}, name="password_reset_complete")
 )

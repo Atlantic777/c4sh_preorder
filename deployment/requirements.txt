@@ -1,10 +1,10 @@
 Django>=1.5.0,<1.6
-https://pypi.python.org/packages/source/P/Pillow/Pillow-2.2.1.zip#md5=d1d20d3db5d1ab312da0951ff061e6bf
+Pillow
 South>=0.8
 Werkzeug>=0.8.3
 django-extensions>=1.1.1
 django-simple-captcha>=0.3.7
-fpdf==1.7
+fpdf
 ipython>=0.13.2
 readline>=6.2.4.1
 requests>=1.2.2

@@ -58,7 +58,11 @@ EVENT_PAYMENT_PREFIX = "BalCCon2k14"
 # Bank details for payment
 EVENT_PAYMENT_DETAILS =  "Linux User Group of Novi Sad\n" + \
  "Institute: Vojvodjanska Banka D.D. (Novi Sad)\n" + \
+<<<<<<< HEAD
  "Account:355-1111320-58"
+=======
+ "Account: 355-1111320-58"
+>>>>>>> repo sync with fixes included
 
 # Bezahlcode integration, see http://bezahlcode.de for more information
 EVENT_BEZAHLCODE_ENABLE = False
@@ -73,7 +77,11 @@ EVENT_DASHBOARD_TEXT = "Here be important event-related supervisor information.<
 EVENT_DESCRIPTION_TEXT = "September 05<sup>th</sup> - 07<sup>th</sup>, 2014 – Novi Sad, Serbia\n"
 
 # Additional information about tickets, to be shown below the ticket selection
+<<<<<<< HEAD
 EVENT_TICKET_INFO = "Hackers under the age of 18 years qualify for the <em>Up-and-coming</em> ticket, registration is necessary. Hackers under the age of 12 years get in for free while accompanied by an adult."
+=======
+EVENT_TICKET_INFO = "* Hackers under the age of 18 years qualify for the <em>Up-and-coming</em> ticket, registration is necessary. Hackers under the age of 12 years get in for free while accompanied by an adult."
+>>>>>>> repo sync with fixes included
 
 # Text for payment ack notification email
 EVENT_PAYMENT_ACK_MAIL_TEXT = 	"English version below" + \
@@ -100,7 +108,11 @@ EVENT_DOWNLOAD_DATE = "2012-09-28 00:00:00"
 EVENT_SUPERVISOR_IPS = ('127.0.0.1', '172.17.0.1',)
 
 # Minimum amount required to require a billing address
+<<<<<<< HEAD
 EVENT_BILLING_ADDRESS_LIMIT = 150.00
+=======
+EVENT_BILLING_ADDRESS_LIMIT = -1.00
+>>>>>>> repo sync with fixes included
 
 # CSV parser module (see backend/csv_parser/*.py)
 EVENT_CSV_PARSER = "sparkasse"

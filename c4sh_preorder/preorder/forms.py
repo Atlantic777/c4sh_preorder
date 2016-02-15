@@ -31,8 +31,8 @@ class GoldenTokenForm(forms.Form):
 class SignupForm(forms.Form):
 	username = UsernameField(max_length=100, required=True)
 	password = forms.CharField(min_length=8, max_length=255, required=True)
-	email = forms.EmailField(required=False)
-
+	email = forms.EmailField(required=True)
+	#country= forms.CharField(required=True)
 	class Meta:
 		model = User
 
@@ -42,7 +42,7 @@ class SignupForm(forms.Form):
 		if email and User.objects.filter(email=email).exclude(username=username).count():
 			raise forms.ValidationError(u'Email addresses must be unique.')
 		return email
-
+          
 class EmailForm(forms.Form):
 	email = forms.EmailField(required=True)
 
@@ -79,4 +79,5 @@ class BillingAddressForm(forms.Form):
 	address2 = forms.CharField(required=False)
 	city = forms.CharField(required=False)
 	zip = forms.CharField(required=False)
-	country = forms.CharField(required=False)
+	country = forms.CharField(required=True) #ovo promeniti u ChoiceField
+	#country = forms.ChoiceField(choices=["Serbia", "other"], required=True) #ovo promeniti u ChoiceField

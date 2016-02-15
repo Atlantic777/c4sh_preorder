@@ -1,15 +1,26 @@
+<script type="text/javascript">
+function copyVal() {
+	hidden_input = document.getElementById("idCountry");
+	combo_input = document.getElementById("idCombo");
+	hidden_input.value = combo_input.value;
+	console.log("Value is: " + hidden_input.value);
+}
+
+window.onload = copyVal;
+
+</script>
 {% load multiply get_index tax_calc i18n %}
             <div class="panel panel-primary">
               <div class="panel-heading">
-                <h3 class="panel-title">{% trans "Billing address" %}</h3>
+                <h3 class="panel-title">{% trans "Please choose residence country: " %}</h3>
               </div>
               <div class="panel-body">
                 <div style="min-height: 40px;">
-                  <p>
-                    {% trans "Since one of your tickets is eligible for an invoice, you may provide us with your billing address." %}
+                  <p>{% trans "Because of high bank transaction rates in Serbia, we have different payment information for foreign visitors. "%}
+                   <!-- {% trans "Since one of your tickets is eligible for an invoice, you may provide us with your billing address." %}-->
                   </p>
                   <form class="form-horizontal" role="form">
-                    <div class="form-group">
+                   <!-- <div class="form-group">
                       <label for="inputCompany" class="sr-only">{% trans "Company" %}</label>
                       <div class="col-md-12 {% if form.company.errors %}has-error{% endif %}">
                         <input type="text" class="form-control" id="inputCompany" name="company" placeholder="{% trans "Company" %}">
@@ -19,39 +30,40 @@
                       </div>
                     </div>
                     <div class="form-group">
-                      <div class="col-md-6 {% if form.firstname.errors %}has-error{% endif %}" style="margin-bottom: 15px;">
-                        <label for="idFirstName" class="sr-only">{% trans "First name" %}</label>
-                        <input type="text" class="form-control" id="idFirstName" name="firstname" placeholder="{% trans "First name" %}">
+		   	 <label for="idFirstName" class="sr-only">{% trans "First name" %}</label>
+                    	 <div class="col-md-6 {% if form.firstname.errors %}has-error{% endif %}">
+                           <input type="text" class="form-control" id="idFirstName" name="firstname" placeholder="{% trans "First name" %}">
                         {% for e in form.firstname.errors %}
+                            <span class="help-block">{{e}}</span>
+                        {% endfor %}
+		    </div>
+		    	<label for="idLastName" class="sr-only">{% trans "Last name" %}</label>
+                    	<div class="col-md-6 {% if form.lastname.errors %}has-error{% endif %}">
+                   	  <input type="text" class="form-control" id="idLastName" name="lastname" placeholder="{% trans "Last name" %}">
+                    	{% for e in form.lastname.errors %}
                           <span class="help-block">{{e}}</span>
                         {% endfor %}
-                      </div>
-                      <div class="col-md-6 {% if form.lastname.errors %}has-error{% endif %}">
-                        <label for="idLastName" class="sr-only">{% trans "Last name" %}</label>
-                        <input type="text" class="form-control" id="idLastName" name="lastname" placeholder="{% trans "Last name" %}">
-                        {% for e in form.lastname.errors %}
-                          <span class="help-block">{{e}}</span>
-                        {% endfor %}
-                      </div>
+                    	</div>
                     </div>
                     <div class="form-group">
-                      <label for="idAddress1" class="sr-only">{% trans "Address line 1" %}</label>
-                      <div class="col-md-12 {% if form.address1.errors %}has-error{% endif %}">
-                        <input type="text" class="form-control" id="idAddress1" name="address1" placeholder="{% trans "Address line 1" %}">
+                    	<label for="idAddress1" class="sr-only">{% trans "Address line 1" %}</label>
+                   	<div class="col-md-12 {% if form.address1.errors %}has-error{% endif %}">
+                     	  <input type="text" class="form-control" id="idAddress1" name="address1" placeholder="{% trans "Address line 1" %}">
                         {% for e in form.address1.errors %}
                           <span class="help-block">{{e}}</span>
                         {% endfor %}
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="idAddress2" class="sr-only">{% trans "Address line 2" %}</label>
-                      <div class="col-md-12 {% if form.address2.errors %}has-error{% endif %}">
-                        <input type="text" class="form-control" id="idAddress2" name="address2" placeholder="{% trans "Address line 2" %}">
-                        {% for e in form.address2.errors %}
-                          <span class="help-block">{{e}}</span>
-                        {% endfor %}
-                      </div>
-                    </div>
+                   	</div>
+		    </div>
+		                        <div class="form-group">
+					                      <label for="idAddress1" class="sr-only">{% trans "Address line 1" %}</label>
+							                            <div class="col-md-12 {% if form.address1.errors %}has-error{% endif %}">
+										                            <input type="text" class="form-control" id="idAddress1" name="address1" placeholder="{% trans "Address line 1" %}">
+													                            {% for e in form.address1.errors %}
+																                              <span class="help-block">{{e}}</span>
+																			                              {% endfor %}
+																						                            </div>
+																									                        </div>
+
                     <div class="form-group">
                       <div class="col-md-2 col-xs-4 {% if form.zip.errors %}has-error{% endif %}" style="margin-bottom: 15px;">
                         <label for="idZipCode" class="sr-only">{% trans "Zip code" %}</label>
@@ -60,27 +72,31 @@
                           <span class="help-block">{{e}}</span>
                         {% endfor %}
                       </div>
-                      <div class="col-md-10 col-xs-8 {% if form.city.errors %}has-error{% endif %}">
+                      <div class="col-md-5 col-xs-8 {% if form.city.errors %}has-error{% endif %}">
                         <label for="idCity" class="sr-only">{% trans "City" %}</label>
                         <input type="text" class="form-control" id="idCity" name="city" placeholder="{% trans "City" %}">
                         {% for e in form.city.errors %}
                           <span class="help-block">{{e}}</span>
                         {% endfor %}
                       </div>
-                    </div>
+                    </div>-->
                     <div class="form-group">
                       <label for="idCountry" class="sr-only">{% trans "Country" %}</label>
-                      <div class="col-md-12 {% if form.country.errors %}has-error{% endif %}">
-                        <input type="text" class="form-control" id="idCountry" name="country" placeholder="{% trans "Country" %}">
+                      <div class="col-md-5 {% if form.country.errors %}has-error{% endif %}">
+		      	<select class="form-control" id="idCombo" onChange="copyVal()">
+			<option value="Serbia">Serbia</option>
+			<option value="Other">Other Country</option>
+			</select>
+                       <input  type="hidden" class="form-control" id="idCountry" name="country" placeholder="{% trans "Country" %}">
                         {% for e in form.country.errors %}
                           <span class="help-block">{{e}}</span>
                         {% endfor %}
                       </div>
                     </div>
                   </form>
-                  <p>
-                    <em><small>{% trans "All fields are optional, but the invoice may be considered invalid depending on where you live if you choose to leave them empty." %} {% trans "By placing your order you agree to receive your invoice via electronical transmission only." %}</small></em>
-                  </p>
+                 <!-- <p>
+                   <em><small>{% trans "All fields are optional, but the invoice may be considered invalid depending on where you live if you choose to leave them empty." %} {% trans "By placing your order you agree to receive your invoice via electronical transmission only." %}</small></em>
+                  </p>-->
                 </div>
               </div>
             </div>

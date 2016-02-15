@@ -43,10 +43,12 @@ def pay_view(request):
         return redirect("my-tickets")
     try:
         total = order.get_sale_amount()[0]['total']
+        total_eur=(total / 115) 
     except KeyError:
         messages.error(request, "You have no preorder to pay.")
         return redirect("my-tickets")
     total = (total + safersettings.EVENT_CC_FEE_FIXED) * (safersettings.EVENT_CC_FEE_PERCENTAGE/100+1)
+    total_eur=(total /115)
     domain = '%s://%s/' % (protocol, settings.APP_URL)
     data = {
         'AMOUNT': int(total * 100),
@@ -139,6 +141,7 @@ def response_view(request):
                         return self.failure(request)
                     try:
                         total = order.get_sale_amount()[0]['total']
+                        total_eur = (total / 115)
                         total_with_fees = (total + safersettings.EVENT_CC_FEE_FIXED) * (safersettings.EVENT_CC_FEE_PERCENTAGE/100+1) 
                         total_with_fees = '%i' % (total_with_fees*100)
 
